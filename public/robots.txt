@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /
+
+# Block nothing — this is a single-page utility app with no admin/private routes
+Disallow:
+
+# Sitemap location
+Sitemap: https://resize.mxprime.in/sitemap.xml

@@ -1,0 +1,199 @@
+{
+  "exams": {
+    "neet-ug": {
+      "id": "neet-ug",
+      "name": "NEET UG",
+      "fullName": "National Eligibility cum Entrance Test (Undergraduate)",
+      "category": "NEET",
+      "docs": {
+        "photo": { "width": 3.5, "height": 4.5, "minKB": 10, "maxKB": 200, "format": "image/jpeg", "aspectRatio": 0.7778, "unit": "cm", "dpi": 200 },
+        "postcard": { "width": 4.0, "height": 6.0, "minKB": 10, "maxKB": 200, "format": "image/jpeg", "aspectRatio": 0.6667, "unit": "inch", "dpi": 200 },
+        "signature": { "width": 3.5, "height": 1.5, "minKB": 4, "maxKB": 30, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "cm", "dpi": 200 },
+        "fingerprints": { "width": 6.0, "height": 4.0, "minKB": 10, "maxKB": 200, "format": "image/jpeg", "aspectRatio": 1.5, "unit": "inch", "dpi": 200 }
+      },
+      "declarationText": ""
+    },
+    "jee-main": {
+      "id": "jee-main",
+      "name": "JEE Main",
+      "fullName": "Joint Entrance Examination - Main",
+      "category": "JEE",
+      "docs": {
+        "photo": { "width": 3.5, "height": 4.5, "minKB": 10, "maxKB": 200, "format": "image/jpeg", "aspectRatio": 0.7778, "unit": "cm", "dpi": 200 },
+        "signature": { "width": 3.5, "height": 1.5, "minKB": 10, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "cm", "dpi": 200 }
+      },
+      "declarationText": ""
+    },
+    "ssc-cgl": {
+      "id": "ssc-cgl",
+      "name": "SSC CGL",
+      "fullName": "Staff Selection Commission - Combined Graduate Level",
+      "category": "SSC",
+      "docs": {
+        "photo": { "width": 3.5, "height": 4.5, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.7778, "unit": "cm", "dpi": 200 },
+        "signature": { "width": 4.0, "height": 2.0, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "cm", "dpi": 200 }
+      },
+      "declarationText": ""
+    },
+    "ssc-chsl": {
+      "id": "ssc-chsl",
+      "name": "SSC CHSL",
+      "fullName": "Staff Selection Commission - Combined Higher Secondary Level",
+      "category": "SSC",
+      "docs": {
+        "photo": { "width": 3.5, "height": 4.5, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.7778, "unit": "cm", "dpi": 200 },
+        "signature": { "width": 4.0, "height": 2.0, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "cm", "dpi": 200 }
+      },
+      "declarationText": ""
+    },
+    "upsc-cse": {
+      "id": "upsc-cse",
+      "name": "UPSC CSE",
+      "fullName": "Union Public Service Commission - Civil Services Examination",
+      "category": "UPSC",
+      "docs": {
+        "photo": { "width": 350, "height": 350, "minKB": 20, "maxKB": 300, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 300 },
+        "signature": { "width": 350, "height": 350, "minKB": 20, "maxKB": 300, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 300 }
+      },
+      "declarationText": ""
+    },
+    "sbi-po": {
+      "id": "sbi-po",
+      "name": "SBI PO",
+      "fullName": "State Bank of India - Probationary Officer",
+      "category": "SBI",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), Date of Birth ______ hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required. The signature, photograph and left thumb impression are of mine."
+    },
+    "sbi-clerk": {
+      "id": "sbi-clerk",
+      "name": "SBI Clerk",
+      "fullName": "State Bank of India - Junior Associate",
+      "category": "SBI",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), Date of Birth ______ hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required. The signature, photograph and left thumb impression are of mine."
+    },
+    "ibps-po": {
+      "id": "ibps-po",
+      "name": "IBPS PO",
+      "fullName": "Institute of Banking Personnel Selection - Probationary Officer",
+      "category": "IBPS",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "ibps-clerk": {
+      "id": "ibps-clerk",
+      "name": "IBPS Clerk",
+      "fullName": "Institute of Banking Personnel Selection - Clerical Cadre",
+      "category": "IBPS",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "ibps-rrb-po": {
+      "id": "ibps-rrb-po",
+      "name": "IBPS RRB PO",
+      "fullName": "Institute of Banking Personnel Selection - Regional Rural Banks Officer Scale I",
+      "category": "IBPS",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "ibps-rrb-clerk": {
+      "id": "ibps-rrb-clerk",
+      "name": "IBPS RRB Clerk",
+      "fullName": "Institute of Banking Personnel Selection - Regional Rural Banks Office Assistant",
+      "category": "IBPS",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "rrb-ntpc": {
+      "id": "rrb-ntpc",
+      "name": "RRB NTPC",
+      "fullName": "Railway Recruitment Board - Non-Technical Popular Categories",
+      "category": "RRB",
+      "docs": {
+        "photo": { "width": 3.5, "height": 4.5, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.7778, "unit": "cm", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 40, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": ""
+    },
+    "rbi-grade-b": {
+      "id": "rbi-grade-b",
+      "name": "RBI Grade B",
+      "fullName": "Reserve Bank of India - Officers in Grade 'B'",
+      "category": "RBI",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "rbi-assistant": {
+      "id": "rbi-assistant",
+      "name": "RBI Assistant",
+      "fullName": "Reserve Bank of India - Assistant",
+      "category": "RBI",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "lic-aao": {
+      "id": "lic-aao",
+      "name": "LIC AAO",
+      "fullName": "Life Insurance Corporation - Assistant Administrative Officer",
+      "category": "LIC",
+      "docs": {
+        "photo": { "width": 200, "height": 230, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 0.8695, "unit": "px", "dpi": 200 },
+        "signature": { "width": 140, "height": 60, "minKB": 10, "maxKB": 20, "format": "image/jpeg", "aspectRatio": 2.3333, "unit": "px", "dpi": 200 },
+        "thumb": { "width": 240, "height": 240, "minKB": 20, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 },
+        "declaration": { "width": 800, "height": 400, "minKB": 50, "maxKB": 100, "format": "image/jpeg", "aspectRatio": 2.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": "I, ______ (Name of the candidate), hereby declare that all the information submitted by me in the application form is correct, true and valid. I will present the supporting documents as and when required."
+    },
+    "custom": {
+      "id": "custom",
+      "name": "Custom Resize",
+      "fullName": "Custom Dimensions & Compression Specs",
+      "category": "OTHER",
+      "docs": {
+        "custom": { "width": 300, "height": 300, "minKB": 10, "maxKB": 50, "format": "image/jpeg", "aspectRatio": 1.0, "unit": "px", "dpi": 200 }
+      },
+      "declarationText": ""
+    }
+  }
+}

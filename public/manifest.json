@@ -1,0 +1,45 @@
+{
+  "name": "MxPrime Resizer",
+  "short_name": "MxPrime",
+  "description": "Free photo & signature resizer for NEET, JEE, SSC, UPSC, IBPS, SBI, RRB exams. 100% offline — your image never leaves your device.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#FAFAF9",
+  "theme_color": "#FF6A00",
+  "lang": "en-IN",
+  "categories": ["utilities", "education", "productivity"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshot-wide.jpg",
+      "sizes": "1280x720",
+      "type": "image/jpeg",
+      "form_factor": "wide",
+      "label": "MxPrime Resizer — Home Screen"
+    },
+    {
+      "src": "/screenshot-narrow.jpg",
+      "sizes": "390x844",
+      "type": "image/jpeg",
+      "form_factor": "narrow",
+      "label": "MxPrime Resizer — Mobile View"
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}
