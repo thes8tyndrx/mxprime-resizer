@@ -673,29 +673,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
               
               {/* Compact SVG Icon Toolbar */}
               <div className="editor-toolbar">
-                {/* Zoom group */}
-                {!skipCrop && (
-                  <div className="toolbar-group">
-                    <button
-                      type="button" className="toolbar-btn"
-                      title="Zoom Out"
-                      onClick={() => { const val = Math.max(1.0, zoom - 0.1); setZoom(val); commitToHistory({ zoom: val }); }}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.5"/><line x1="4.5" y1="6.5" x2="8.5" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                    </button>
-                    <button
-                      type="button" className="toolbar-btn"
-                      title="Zoom In"
-                      onClick={() => { const val = Math.min(3.0, zoom + 0.1); setZoom(val); commitToHistory({ zoom: val }); }}
-                    >
-                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.5"/><line x1="6.5" y1="4.5" x2="6.5" y2="8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><line x1="4.5" y1="6.5" x2="8.5" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
-                    </button>
-                  </div>
-                )}
 
-                <div className="toolbar-sep" />
-
-                {/* Rotate group */}
                 <div className="toolbar-group">
                   <button
                     type="button" className="toolbar-btn"
@@ -715,7 +693,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
 
                 <div className="toolbar-sep" />
 
-                {/* Flip group */}
+                {/* Flip H only */}
                 <div className="toolbar-group">
                   <button
                     type="button" className={`toolbar-btn${flipH ? ' active' : ''}`}
@@ -723,13 +701,6 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
                     onClick={() => { const val = !flipH; setFlipH(val); commitToHistory({ flipH: val }); }}
                   >
                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/><path d="M5 4L2 8l3 4V4z" fill="currentColor" opacity=".7"/><path d="M11 4l3 4-3 4V4z" fill="currentColor" opacity=".7"/></svg>
-                  </button>
-                  <button
-                    type="button" className={`toolbar-btn${flipV ? ' active' : ''}`}
-                    title="Flip Vertical"
-                    onClick={() => { const val = !flipV; setFlipV(val); commitToHistory({ flipV: val }); }}
-                  >
-                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/><path d="M4 5l4-3 4 3H4z" fill="currentColor" opacity=".7"/><path d="M4 11l4 3 4-3H4z" fill="currentColor" opacity=".7"/></svg>
                   </button>
                 </div>
 
