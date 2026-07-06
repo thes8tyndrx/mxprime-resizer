@@ -671,60 +671,107 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
           {imageSrc ? (
             <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
               
-              {/* Canvas Top Action Control Toolbar */}
-              <div style={{
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                gap: '8px',
-                backgroundColor: '#292524',
-                padding: '8px',
-                width: '100%',
-                flexWrap: 'wrap',
-                borderTopLeftRadius: '2px',
-                borderTopRightRadius: '2px'
-              }}>
+              {/* Compact SVG Icon Toolbar */}
+              <div className="editor-toolbar">
+                {/* Zoom group */}
                 {!skipCrop && (
-                  <>
-                    <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => { const val = Math.max(1.0, zoom - 0.1); setZoom(val); commitToHistory({ zoom: val }); }} title="Zoom Out">🔍➖</button>
-                    <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => { const val = Math.min(3.0, zoom + 0.1); setZoom(val); commitToHistory({ zoom: val }); }} title="Zoom In">🔍➕</button>
-                    <span style={{ color: '#57534E', margin: '0 2px' }}>|</span>
-                  </>
+                  <div className="toolbar-group">
+                    <button
+                      type="button" className="toolbar-btn"
+                      title="Zoom Out"
+                      onClick={() => { const val = Math.max(1.0, zoom - 0.1); setZoom(val); commitToHistory({ zoom: val }); }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.5"/><line x1="4.5" y1="6.5" x2="8.5" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    </button>
+                    <button
+                      type="button" className="toolbar-btn"
+                      title="Zoom In"
+                      onClick={() => { const val = Math.min(3.0, zoom + 0.1); setZoom(val); commitToHistory({ zoom: val }); }}
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="6.5" cy="6.5" r="4" stroke="currentColor" strokeWidth="1.5"/><line x1="6.5" y1="4.5" x2="6.5" y2="8.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><line x1="4.5" y1="6.5" x2="8.5" y2="6.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><line x1="10" y1="10" x2="14" y2="14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                    </button>
+                  </div>
                 )}
 
-                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => { const val = (rotation - 90 + 360) % 360; setRotation(val); commitToHistory({ rotation: val }); }} title="Rotate Left">🔄 L</button>
-                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => { const val = (rotation + 90) % 360; setRotation(val); commitToHistory({ rotation: val }); }} title="Rotate Right">🔄 R</button>
-                
-                <span style={{ color: '#57534E', margin: '0 2px' }}>|</span>
+                <div className="toolbar-sep" />
 
-                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => { const val = !flipH; setFlipH(val); commitToHistory({ flipH: val }); }} title="Flip Horizontally">↔️ H</button>
-                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={() => { const val = !flipV; setFlipV(val); commitToHistory({ flipV: val }); }} title="Flip Vertically">↕️ V</button>
+                {/* Rotate group */}
+                <div className="toolbar-group">
+                  <button
+                    type="button" className="toolbar-btn"
+                    title="Rotate Counter-Clockwise"
+                    onClick={() => { const val = (rotation - 90 + 360) % 360; setRotation(val); commitToHistory({ rotation: val }); }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3.5 8a4.5 4.5 0 1 0 .9-2.7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M4 3.5V6H1.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                  <button
+                    type="button" className="toolbar-btn"
+                    title="Rotate Clockwise"
+                    onClick={() => { const val = (rotation + 90) % 360; setRotation(val); commitToHistory({ rotation: val }); }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M12.5 8a4.5 4.5 0 1 1-.9-2.7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/><path d="M12 3.5V6h2.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                </div>
 
-                <span style={{ color: '#57534E', margin: '0 2px' }}>|</span>
+                <div className="toolbar-sep" />
 
-                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={handleUndo} disabled={historyIndex <= 0} title="Undo">↩️ Undo</button>
-                <button type="button" className="btn-secondary" style={{ padding: '4px 8px', fontSize: '11px' }} onClick={handleRedo} disabled={historyIndex >= history.length - 1} title="Redo">↪️ Redo</button>
+                {/* Flip group */}
+                <div className="toolbar-group">
+                  <button
+                    type="button" className={`toolbar-btn${flipH ? ' active' : ''}`}
+                    title="Flip Horizontal"
+                    onClick={() => { const val = !flipH; setFlipH(val); commitToHistory({ flipH: val }); }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/><path d="M5 4L2 8l3 4V4z" fill="currentColor" opacity=".7"/><path d="M11 4l3 4-3 4V4z" fill="currentColor" opacity=".7"/></svg>
+                  </button>
+                  <button
+                    type="button" className={`toolbar-btn${flipV ? ' active' : ''}`}
+                    title="Flip Vertical"
+                    onClick={() => { const val = !flipV; setFlipV(val); commitToHistory({ flipV: val }); }}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 8h12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeDasharray="2 2"/><path d="M4 5l4-3 4 3H4z" fill="currentColor" opacity=".7"/><path d="M4 11l4 3 4-3H4z" fill="currentColor" opacity=".7"/></svg>
+                  </button>
+                </div>
 
-                <span style={{ color: '#57534E', margin: '0 2px' }}>|</span>
+                <div className="toolbar-sep" />
 
+                {/* Undo / Redo */}
+                <div className="toolbar-group">
+                  <button
+                    type="button" className="toolbar-btn"
+                    title="Undo"
+                    onClick={handleUndo}
+                    disabled={historyIndex <= 0}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8a5 5 0 1 0 1.1-3.1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M4 3.5V7H1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                  <button
+                    type="button" className="toolbar-btn"
+                    title="Redo"
+                    onClick={handleRedo}
+                    disabled={historyIndex >= history.length - 1}
+                  >
+                    <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M13 8a5 5 0 1 1-1.1-3.1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/><path d="M12 3.5V7h3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                  </button>
+                </div>
+
+                <div className="toolbar-sep" />
+
+                {/* Reset */}
                 <button
                   type="button"
-                  className="btn-secondary"
-                  style={{ padding: '4px 8px', fontSize: '11px', backgroundColor: '#FCA5A5', color: '#7F1D1D', fontWeight: 'bold' }}
+                  className="toolbar-btn toolbar-btn-reset"
+                  title="Reset all transforms"
                   onClick={() => {
-                    setZoom(1.0);
-                    setPan({ x: 0, y: 0 });
-                    setRotation(0);
-                    setFlipH(false);
-                    setFlipV(false);
-                    setBrightness(100);
-                    setContrast(100);
-                    setBgColor('#FFFFFF');
+                    setZoom(1.0); setPan({ x: 0, y: 0 });
+                    setRotation(0); setFlipH(false); setFlipV(false);
+                    setBrightness(100); setContrast(100); setBgColor('#FFFFFF');
                     setHistory([{ rotation: 0, flipH: false, flipV: false, zoom: 1.0, pan: { x: 0, y: 0 } }]);
                     setHistoryIndex(0);
                   }}
                 >
-                  Reset
+                  <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.3 4.3 8 8m0 0 3.7 3.7M8 8 11.7 4.3M8 8 4.3 11.7" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/></svg>
+                  <span className="toolbar-btn-label">Reset</span>
                 </button>
               </div>
 
