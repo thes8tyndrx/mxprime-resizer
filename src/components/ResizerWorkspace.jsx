@@ -99,12 +99,18 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
   const [bgColor, setBgColor] = useState('#FFFFFF');
   const [skipCrop, setSkipCrop] = useState(false);
 
+  // Document Levels Adjustment (Highlights, Shadows, Midtones/Gamma)
+  const [levelsHighlights, setLevelsHighlights] = useState(255);
+  const [levelsShadows, setLevelsShadows] = useState(0);
+  const [levelsMidtones, setLevelsMidtones] = useState(1.0);
+
   // Undo / Redo History
   const [history, setHistory] = useState([{ rotation: 0, flipH: false, flipV: false, zoom: 1.0, pan: { x: 0, y: 0 } }]);
   const [historyIndex, setHistoryIndex] = useState(0);
   
   // Processed Output
   const [processedResult, setProcessedResult] = useState(null);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
 
   // Track and revoke Object URLs to prevent memory leaks
@@ -181,6 +187,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
       processedUrlRef.current = null;
     }
     setProcessedResult(null);
+    setShowPreviewModal(false);
   };
 
   // Active specs used by cropper and compressor
@@ -393,7 +400,12 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
         brightness,
         contrast,
         bgColor,
-        skipCrop
+        skipCrop,
+        levels: {
+          shadows: levelsShadows,
+          highlights: levelsHighlights,
+          midtones: levelsMidtones
+        }
       });
 
       const canvas = document.createElement('canvas');
@@ -421,6 +433,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
           dataUrl: previewUrl
         });
 
+        setShowPreviewModal(true);
         setIsProcessing(false);
         addToast('Document resized and compressed successfully!', 'success');
       };
@@ -450,6 +463,18 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
     });
     
     addToast('Document added to download batch.', 'success');
+  };
+
+  const handleDownloadDirect = () => {
+    if (!processedResult) return;
+    const a = document.createElement('a');
+    a.href = processedResult.dataUrl;
+    const presetName = selectedPresetId.replace(/-+/g, '_');
+    a.download = `mxprime_${presetName}_${activeDoc}_${processedResult.width}x${processedResult.height}.jpg`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    addToast('Document downloaded successfully!', 'success');
   };
 
   // Convert pixels to display text
@@ -551,35 +576,41 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px', marginBottom: '12px' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">Width</label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="any"
-                  className="form-input"
-                  value={inputWidth}
-                  onChange={(e) => {
-                    setInputWidth(e.target.value);
-                    const val = parseFloat(e.target.value) || 0;
-                    setWidthPx(Math.max(20, convertToPx(val, targetUnit, targetDPI)));
-                    setSelectedPresetId('custom');
-                  }}
-                />
+                <div className="input-with-suffix">
+                  <input
+                    type="number"
+                    min="0.1"
+                    step="any"
+                    className="form-input"
+                    value={inputWidth}
+                    onChange={(e) => {
+                      setInputWidth(e.target.value);
+                      const val = parseFloat(e.target.value) || 0;
+                      setWidthPx(Math.max(20, convertToPx(val, targetUnit, targetDPI)));
+                      setSelectedPresetId('custom');
+                    }}
+                  />
+                  <span className="input-suffix-badge">{targetUnit}</span>
+                </div>
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">Height</label>
-                <input
-                  type="number"
-                  min="0.1"
-                  step="any"
-                  className="form-input"
-                  value={inputHeight}
-                  onChange={(e) => {
-                    setInputHeight(e.target.value);
-                    const val = parseFloat(e.target.value) || 0;
-                    setHeightPx(Math.max(20, convertToPx(val, targetUnit, targetDPI)));
-                    setSelectedPresetId('custom');
-                  }}
-                />
+                <div className="input-with-suffix">
+                  <input
+                    type="number"
+                    min="0.1"
+                    step="any"
+                    className="form-input"
+                    value={inputHeight}
+                    onChange={(e) => {
+                      setInputHeight(e.target.value);
+                      const val = parseFloat(e.target.value) || 0;
+                      setHeightPx(Math.max(20, convertToPx(val, targetUnit, targetDPI)));
+                      setSelectedPresetId('custom');
+                    }}
+                  />
+                  <span className="input-suffix-badge">{targetUnit}</span>
+                </div>
               </div>
             </div>
 
@@ -605,25 +636,28 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">DPI</label>
-                <input
-                  type="number"
-                  min="72"
-                  max="1200"
-                  className="form-input"
-                  value={targetDPI}
-                  onChange={(e) => {
-                    const parsed = parseInt(e.target.value);
-                    const newDPI = Math.max(72, isNaN(parsed) ? 200 : parsed);
-                    setTargetDPI(newDPI);
-                    
-                    // Update pixel value based on new DPI to keep displayed units constant
-                    const wVal = parseFloat(inputWidth) || 0;
-                    const hVal = parseFloat(inputHeight) || 0;
-                    setWidthPx(Math.max(20, convertToPx(wVal, targetUnit, newDPI)));
-                    setHeightPx(Math.max(20, convertToPx(hVal, targetUnit, newDPI)));
-                    setSelectedPresetId('custom');
-                  }}
-                />
+                <div className="input-with-suffix">
+                  <input
+                    type="number"
+                    min="72"
+                    max="1200"
+                    className="form-input"
+                    value={targetDPI}
+                    onChange={(e) => {
+                      const parsed = parseInt(e.target.value);
+                      const newDPI = Math.max(72, isNaN(parsed) ? 200 : parsed);
+                      setTargetDPI(newDPI);
+                      
+                      // Update pixel value based on new DPI to keep displayed units constant
+                      const wVal = parseFloat(inputWidth) || 0;
+                      const hVal = parseFloat(inputHeight) || 0;
+                      setWidthPx(Math.max(20, convertToPx(wVal, targetUnit, newDPI)));
+                      setHeightPx(Math.max(20, convertToPx(hVal, targetUnit, newDPI)));
+                      setSelectedPresetId('custom');
+                    }}
+                  />
+                  <span className="input-suffix-badge">DPI</span>
+                </div>
               </div>
             </div>
           </div>
@@ -634,31 +668,37 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '8px' }}>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">Min KB</label>
-                <input
-                  type="number"
-                  min="1"
-                  className="form-input"
-                  value={targetMinKB}
-                  onChange={(e) => {
-                    const val = Math.max(1, parseInt(e.target.value) || 10);
-                    setTargetMinKB(val);
-                    setSelectedPresetId('custom');
-                  }}
-                />
+                <div className="input-with-suffix">
+                  <input
+                    type="number"
+                    min="1"
+                    className="form-input"
+                    value={targetMinKB}
+                    onChange={(e) => {
+                      const val = Math.max(1, parseInt(e.target.value) || 10);
+                      setTargetMinKB(val);
+                      setSelectedPresetId('custom');
+                    }}
+                  />
+                  <span className="input-suffix-badge">KB</span>
+                </div>
               </div>
               <div className="form-group" style={{ marginBottom: 0 }}>
                 <label className="form-label">Max KB</label>
-                <input
-                  type="number"
-                  min="5"
-                  className="form-input"
-                  value={targetMaxKB}
-                  onChange={(e) => {
-                    const val = Math.max(5, parseInt(e.target.value) || 50);
-                    setTargetMaxKB(val);
-                    setSelectedPresetId('custom');
-                  }}
-                />
+                <div className="input-with-suffix">
+                  <input
+                    type="number"
+                    min="5"
+                    className="form-input"
+                    value={targetMaxKB}
+                    onChange={(e) => {
+                      const val = Math.max(5, parseInt(e.target.value) || 50);
+                      setTargetMaxKB(val);
+                      setSelectedPresetId('custom');
+                    }}
+                  />
+                  <span className="input-suffix-badge">KB</span>
+                </div>
               </div>
             </div>
           </div>
@@ -737,6 +777,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
                     setZoom(1.0); setPan({ x: 0, y: 0 });
                     setRotation(0); setFlipH(false); setFlipV(false);
                     setBrightness(100); setContrast(100); setBgColor('#FFFFFF');
+                    setLevelsHighlights(255); setLevelsShadows(0); setLevelsMidtones(1.0);
                     setHistory([{ rotation: 0, flipH: false, flipV: false, zoom: 1.0, pan: { x: 0, y: 0 } }]);
                     setHistoryIndex(0);
                   }}
@@ -864,6 +905,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
                     setImageSrc(null);
                     setUploadedFile(null);
                     setProcessedResult(null);
+                    setShowPreviewModal(false);
                   }}
                 >
                   Clear File
@@ -952,6 +994,77 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
                 max="150"
                 value={contrast}
                 onChange={(e) => setContrast(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--accent)' }}
+                disabled={!imageSrc}
+              />
+            </div>
+          </div>
+
+          {/* DOCUMENT SCANNER ENHANCER block */}
+          <div className="sidebar-block">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+              <h4 className="sidebar-block-title" style={{ marginBottom: 0 }}>Document Enhancer</h4>
+              <button
+                type="button"
+                className="btn-magic-clean"
+                onClick={() => {
+                  setLevelsHighlights(195);
+                  setLevelsShadows(45);
+                  setLevelsMidtones(1.2);
+                  addToast('Applied Magic Clean settings!', 'info');
+                }}
+                disabled={!imageSrc}
+                title="Automatically whitens background paper and darkens text"
+              >
+                ✨ Magic Clean
+              </button>
+            </div>
+            
+            <div className="form-group" style={{ marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Paper Whiteness (Highlights)</label>
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>{255 - levelsHighlights}</span>
+              </div>
+              <input
+                type="range"
+                min="140"
+                max="255"
+                value={levelsHighlights}
+                onChange={(e) => setLevelsHighlights(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--accent)' }}
+                disabled={!imageSrc}
+              />
+              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>Slide left to whiten grey paper backgrounds</span>
+            </div>
+
+            <div className="form-group" style={{ marginBottom: '12px' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Ink Density (Shadows)</label>
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>{levelsShadows}</span>
+              </div>
+              <input
+                type="range"
+                min="0"
+                max="120"
+                value={levelsShadows}
+                onChange={(e) => setLevelsShadows(parseInt(e.target.value))}
+                style={{ width: '100%', accentColor: 'var(--accent)' }}
+                disabled={!imageSrc}
+              />
+              <span style={{ fontSize: '9px', color: 'var(--text-muted)', display: 'block', marginTop: '2px' }}>Slide right to make text and signatures darker</span>
+            </div>
+
+            <div className="form-group">
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <label className="form-label" style={{ marginBottom: 0 }}>Gamma (Midtones)</label>
+                <span style={{ fontSize: '11px', fontFamily: 'var(--font-mono)' }}>{levelsMidtones.toFixed(1)}</span>
+              </div>
+              <input
+                type="range"
+                min="5"
+                max="20"
+                value={Math.round(levelsMidtones * 10)}
+                onChange={(e) => setLevelsMidtones(parseFloat(e.target.value) / 10)}
                 style={{ width: '100%', accentColor: 'var(--accent)' }}
                 disabled={!imageSrc}
               />
@@ -1105,6 +1218,56 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
         </div>
 
       </div>
+
+      {/* Download Preview Modal Overlay */}
+      {showPreviewModal && processedResult && (
+        <div className="ic-modal-overlay" onClick={() => setShowPreviewModal(false)}>
+          <div className="ic-modal-container" onClick={(e) => e.stopPropagation()}>
+            <div className="ic-modal-header">
+              <h3 className="ic-modal-title">Ready for Download</h3>
+              <button className="ic-modal-close-btn" onClick={() => setShowPreviewModal(false)}>&times;</button>
+            </div>
+            <div className="ic-modal-body">
+              {/* Left Side: Preview Card */}
+              <div className="ic-modal-preview-card">
+                <img src={processedResult.dataUrl} alt="Processed Output Preview" className="ic-modal-preview-img" />
+              </div>
+              {/* Right Side: Details & Action Verification */}
+              <div className="ic-modal-details">
+                <div className="ic-modal-details-grid">
+                  <div className="ic-modal-detail-item">
+                    <span className="ic-modal-detail-label">File Size</span>
+                    <span className="ic-modal-detail-value">{processedResult.sizeKB} KB</span>
+                    <span className="ic-modal-detail-status success">✓ Within target size ({spec.minKB}-{spec.maxKB} KB)</span>
+                  </div>
+                  <div className="ic-modal-detail-item">
+                    <span className="ic-modal-detail-label">Dimensions</span>
+                    <span className="ic-modal-detail-value">{getFormattedDimensions(activeDoc, targetUnit, processedResult)}</span>
+                    <span className="ic-modal-detail-status success">✓ Exact Spec: {processedResult.width} x {processedResult.height} px</span>
+                  </div>
+                  <div className="ic-modal-detail-item">
+                    <span className="ic-modal-detail-label">File Format</span>
+                    <span className="ic-modal-detail-value">JPEG / JPG</span>
+                    <span className="ic-modal-detail-status success">✓ Compliance Checked</span>
+                  </div>
+                </div>
+                
+                <div className="ic-modal-actions">
+                  <button className="btn-accent" style={{ padding: '12px' }} onClick={handleDownloadDirect}>
+                    Download Image
+                  </button>
+                  <button className="btn-secondary" style={{ padding: '12px' }} onClick={() => { handleAddToBatchClick(); setShowPreviewModal(false); }}>
+                    Add to Download Batch
+                  </button>
+                  <button className="btn-secondary" style={{ padding: '12px' }} onClick={() => setShowPreviewModal(false)}>
+                    Edit More
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

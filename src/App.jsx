@@ -12,6 +12,7 @@ function App() {
   const [activeExam, setActiveExam] = useState(exams[0]);
   const [batch, setBatch] = useState([]);
   const [toasts, setToasts] = useState([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Toast notification manager
   const addToast = (message, type = 'info') => {
@@ -88,8 +89,33 @@ function App() {
             <h2 style={{ fontFamily: 'var(--font-display)', textAlign: 'center', fontSize: '24px', letterSpacing: '-0.02em', fontWeight: 800 }}>
               Select an Exam to Start Resizing
             </h2>
+
+            {/* Search Bar */}
+            <div className="search-container">
+              <input
+                type="text"
+                className="search-input"
+                placeholder="Search exams (e.g. SSC, IBPS, NEET)..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
+              {searchQuery && (
+                <button className="search-clear-btn" onClick={() => setSearchQuery('')}>
+                  &times;
+                </button>
+              )}
+            </div>
+
             <div className="exam-grid">
-              {exams.map((exam) => {
+              {exams
+                .filter((exam) => {
+                  const query = searchQuery.toLowerCase();
+                  return (
+                    exam.name.toLowerCase().includes(query) ||
+                    exam.fullName.toLowerCase().includes(query)
+                  );
+                })
+                .map((exam) => {
                 const docKeys = Object.keys(exam.docs || {});
                 const docLabels = { photo: 'Photos', signature: 'Signatures', thumb: 'Thumb Impressions', declaration: 'Declarations', postcard: 'Postcard Photos', fingerprints: 'Fingerprints', custom: 'Custom Sizes' };
                 const docsDesc = docKeys.map(k => docLabels[k] || k).join(', ');
@@ -134,6 +160,17 @@ function App() {
                 <span className="exam-card-action" style={{ color: 'var(--accent)' }}>Configure Custom →</span>
               </div>
             </div>
+            {exams.filter((exam) => {
+              const query = searchQuery.toLowerCase();
+              return (
+                exam.name.toLowerCase().includes(query) ||
+                exam.fullName.toLowerCase().includes(query)
+              );
+            }).length === 0 && (
+              <div style={{ textAlign: 'center', padding: '48px 16px', color: 'var(--text-secondary)', fontFamily: 'var(--font-mono)', fontSize: '13px', background: '#FAF9F6', border: '1px dashed var(--border-color-dark)', borderRadius: '2px', marginTop: '16px' }}>
+                🔍 No matching exams found for &ldquo;{searchQuery}&rdquo;. Try searching for &ldquo;SSC&rdquo;, &ldquo;IBPS&rdquo;, or &ldquo;NEET&rdquo;.
+              </div>
+            )}
           </div>
 
           <ComparisonTable />

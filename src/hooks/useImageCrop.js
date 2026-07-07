@@ -217,30 +217,35 @@ export function useImageCrop(aspectRatio = null) {
         brightness = 100,
         contrast = 100,
         bgColor = '#FFFFFF',
-        skipCrop = false
+        skipCrop = false,
+        levels = null
       } = options;
 
       const containerWidth = imgElement.clientWidth || imgElement.width;
-      const containerHeight = imgElement.clientHeight || imgElement.height;
+      const naturalWidth = imgElement.naturalWidth || imgElement.width;
+      const naturalHeight = imgElement.naturalHeight || imgElement.height;
 
-      // 1. Create a temporary canvas matching the visual workspace size
+      // Calculate display-to-natural scaling factor
+      const scaleFactor = naturalWidth / containerWidth;
+
+      // 1. Create a temporary canvas matching the natural/original size of the image
       const tempCanvas = document.createElement('canvas');
-      tempCanvas.width = containerWidth;
-      tempCanvas.height = containerHeight;
+      tempCanvas.width = naturalWidth;
+      tempCanvas.height = naturalHeight;
       const tempCtx = tempCanvas.getContext('2d');
 
       // 2. Fill background color
       tempCtx.fillStyle = bgColor;
-      tempCtx.fillRect(0, 0, containerWidth, containerHeight);
+      tempCtx.fillRect(0, 0, naturalWidth, naturalHeight);
 
       // 3. Apply filters (brightness, contrast)
       tempCtx.filter = `brightness(${brightness}%) contrast(${contrast}%)`;
 
-      // 4. Render the transformed image onto temp canvas
+      // 4. Render the transformed image onto temp canvas at natural resolution
       tempCtx.save();
-      // Translate to center + pan offset
-      tempCtx.translate(containerWidth / 2 + pan.x, containerHeight / 2 + pan.y);
-      // Scale for zoom
+      // Translate to center + pan offset (panning is scaled to natural resolution)
+      tempCtx.translate(naturalWidth / 2 + pan.x * scaleFactor, naturalHeight / 2 + pan.y * scaleFactor);
+      // Scale for zoom (zoom remains dimensionless/relative)
       tempCtx.scale(zoom, zoom);
       // Rotate around transformed center
       tempCtx.rotate((rotation * Math.PI) / 180);
@@ -249,13 +254,13 @@ export function useImageCrop(aspectRatio = null) {
       const scaleY = flipV ? -1 : 1;
       tempCtx.scale(scaleX, scaleY);
 
-      // Draw the image centered
+      // Draw the image centered at its natural dimensions
       tempCtx.drawImage(
         imgElement,
-        -containerWidth / 2,
-        -containerHeight / 2,
-        containerWidth,
-        containerHeight
+        -naturalWidth / 2,
+        -naturalHeight / 2,
+        naturalWidth,
+        naturalHeight
       );
       tempCtx.restore();
 
@@ -265,11 +270,15 @@ export function useImageCrop(aspectRatio = null) {
       finalCanvas.height = targetHeight;
       const finalCtx = finalCanvas.getContext('2d');
 
+      // Enable high-quality smoothing on the final resize
+      finalCtx.imageSmoothingEnabled = true;
+      finalCtx.imageSmoothingQuality = 'high';
+
       if (skipCrop) {
         // Fit entire temp canvas onto final canvas (retaining aspect ratio)
-        const scale = Math.min(targetWidth / containerWidth, targetHeight / containerHeight);
-        const dw = containerWidth * scale;
-        const dh = containerHeight * scale;
+        const scale = Math.min(targetWidth / naturalWidth, targetHeight / naturalHeight);
+        const dw = naturalWidth * scale;
+        const dh = naturalHeight * scale;
         const dx = (targetWidth - dw) / 2;
         const dy = (targetHeight - dh) / 2;
 
@@ -277,17 +286,53 @@ export function useImageCrop(aspectRatio = null) {
         finalCtx.fillRect(0, 0, targetWidth, targetHeight);
         finalCtx.drawImage(tempCanvas, dx, dy, dw, dh);
       } else {
-        // Extract the cropped region in display pixels
-        const cropLeftPx = (crop.x / 100) * containerWidth;
-        const cropTopPx = (crop.y / 100) * containerHeight;
-        const cropWidthPx = (crop.width / 100) * containerWidth;
-        const cropHeightPx = (crop.height / 100) * containerHeight;
+        // Extract the cropped region in natural pixels (percentage of natural resolution)
+        const cropLeftPx = (crop.x / 100) * naturalWidth;
+        const cropTopPx = (crop.y / 100) * naturalHeight;
+        const cropWidthPx = (crop.width / 100) * naturalWidth;
+        const cropHeightPx = (crop.height / 100) * naturalHeight;
 
         finalCtx.drawImage(
           tempCanvas,
           cropLeftPx, cropTopPx, cropWidthPx, cropHeightPx,
           0, 0, targetWidth, targetHeight
         );
+      }
+
+      // 5b. Apply Document Levels adjustment if configured
+      if (levels && (levels.shadows > 0 || levels.highlights < 255 || levels.midtones !== 1.0)) {
+        try {
+          const { shadows = 0, highlights = 255, midtones = 1.0 } = levels;
+          const imageData = finalCtx.getImageData(0, 0, targetWidth, targetHeight);
+          const data = imageData.data;
+          
+          // Precompute lookup table (LUT) for performance
+          const lut = new Uint8Array(256);
+          const range = highlights - shadows;
+          const invGamma = 1.0 / midtones;
+          
+          for (let i = 0; i < 256; i++) {
+            // Normalize and clamp value
+            let val = range === 0 ? (i >= shadows ? 1.0 : 0.0) : (i - shadows) / range;
+            val = Math.max(0.0, Math.min(1.0, val));
+            // Gamma adjustment
+            if (midtones !== 1.0) {
+              val = Math.pow(val, invGamma);
+            }
+            lut[i] = Math.round(val * 255);
+          }
+          
+          // Process pixel data (R, G, B channels only)
+          for (let i = 0; i < data.length; i += 4) {
+            data[i] = lut[data[i]];       // Red
+            data[i + 1] = lut[data[i + 1]]; // Green
+            data[i + 2] = lut[data[i + 2]]; // Blue
+          }
+          
+          finalCtx.putImageData(imageData, 0, 0);
+        } catch (e) {
+          console.error("Levels filter processing failed:", e);
+        }
       }
 
       // 6. Name & Date Overlay (drawn without filters or transformations on final canvas)
@@ -318,7 +363,8 @@ export function useImageCrop(aspectRatio = null) {
         finalCtx.restore();
       }
 
-      const dataUrl = finalCanvas.toDataURL('image/jpeg', 0.95);
+      // Lossless PNG export to prevent generational JPEG compression quality loss before the final binary size search
+      const dataUrl = finalCanvas.toDataURL('image/png');
       resolve(dataUrl);
     });
   }, [crop, zoom, pan]);
