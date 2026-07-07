@@ -179,37 +179,48 @@ function App() {
 
       {/* RENDER WORKSPACE VIEW */}
       {view === 'workspace' && (
-        <div className="container" style={{ paddingTop: '40px' }}>
-          {/* Back Navigation Bar */}
-          <button className="back-button" onClick={() => setView('home')}>
-            ← Back to Exams
-          </button>
+        <div className="workspace-container">
+          {/* Header Section */}
+          <div className="workspace-header">
+            {/* Back Navigation Bar */}
+            <button className="back-button" onClick={() => setView('home')}>
+              ← Back to Exams
+            </button>
 
-          {/* Heading */}
-          <div style={{ marginBottom: '24px' }}>
-            <span className="eyebrow-tag" style={{ marginBottom: '12px' }}>
-              {activeExam.name} Active Config
-            </span>
-            <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 800, letterSpacing: '-0.02em' }}>
-              Document Resizer Workspace
-            </h2>
-            <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
-              Configure, crop, and validate requirements for {activeExam.fullName}.
-            </p>
+            {/* Heading */}
+            <div style={{ marginBottom: '24px' }}>
+              <span className="eyebrow-tag" style={{ marginBottom: '12px' }}>
+                {activeExam.name} Active Config
+              </span>
+              <h2 style={{ fontFamily: 'var(--font-display)', fontSize: '28px', fontWeight: 800, letterSpacing: '-0.02em' }}>
+                Document Resizer Workspace
+              </h2>
+              <p style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>
+                Configure, crop, and validate requirements for {activeExam.fullName}.
+              </p>
+            </div>
           </div>
 
-          <ResizerWorkspace
-            activeExam={activeExam}
-            onAddToBatch={handleAddToBatch}
-            addToast={addToast}
-          />
+          <div className={`workspace-body-layout ${batch.length > 0 ? 'has-batch' : 'no-batch'}`}>
+            <div className="workspace-main-panel">
+              <ResizerWorkspace
+                activeExam={activeExam}
+                onAddToBatch={handleAddToBatch}
+                addToast={addToast}
+              />
+            </div>
 
-          <BatchDashboard
-            batch={batch}
-            onRemoveFromBatch={handleRemoveFromBatch}
-            activeExam={activeExam}
-            addToast={addToast}
-          />
+            {batch.length > 0 && (
+              <div className="workspace-dashboard-panel">
+                <BatchDashboard
+                  batch={batch}
+                  onRemoveFromBatch={handleRemoveFromBatch}
+                  activeExam={activeExam}
+                  addToast={addToast}
+                />
+              </div>
+            )}
+          </div>
         </div>
       )}
 

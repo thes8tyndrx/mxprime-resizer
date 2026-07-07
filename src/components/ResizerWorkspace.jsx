@@ -17,6 +17,8 @@ Object.entries(examData.exams).forEach(([examId, exam]) => {
       docType: 'custom',
       width: 300,
       height: 300,
+      originalWidth: null,
+      originalHeight: null,
       minKB: 10,
       maxKB: 50,
       unit: 'px',
@@ -57,6 +59,8 @@ Object.entries(examData.exams).forEach(([examId, exam]) => {
         docType: docType,
         width: widthPx,
         height: heightPx,
+        originalWidth: doc.width,
+        originalHeight: doc.height,
         minKB: doc.minKB,
         maxKB: doc.maxKB,
         unit: doc.unit || 'px',
@@ -555,17 +559,42 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
             </div>
 
             <div className="presets-grid">
-              {PRESETS_LIST.filter(preset => preset.category === currentExamFilter || (currentExamFilter === 'OTHER' && preset.id === 'custom')).map((preset) => (
-                <button
-                  key={preset.id}
-                  type="button"
-                  className={`preset-card-btn ${selectedPresetId === preset.id ? 'active' : ''}`}
-                  onClick={() => handlePresetSelect(preset)}
-                >
-                  <span className="preset-card-name">{preset.name}</span>
-                  <span className="preset-card-label">{preset.label}</span>
-                </button>
-              ))}
+              {PRESETS_LIST.filter(preset => preset.category === currentExamFilter || (currentExamFilter === 'OTHER' && preset.id === 'custom')).map((preset) => {
+                const isCustom = preset.id === 'custom';
+                
+                // Get clean short name, e.g. "PO Photo" or "CGL Signature"
+                let displayName = preset.name;
+                if (!isCustom) {
+                  const examParts = preset.examId.split('-');
+                  if (examParts.length > 1) {
+                    const subExam = examParts.slice(1).join(' ').toUpperCase(); // "PO" or "CGL"
+                    const docTypeName = preset.docType.charAt(0).toUpperCase() + preset.docType.slice(1);
+                    displayName = `${subExam} ${docTypeName}`; // "PO Photo" or "CGL Signature"
+                  } else {
+                    displayName = preset.docType.charAt(0).toUpperCase() + preset.docType.slice(1);
+                  }
+                }
+                
+                // Get the specs layout with linebreaks so it matches the original CSS style
+                let displaySpecs = '';
+                if (isCustom) {
+                  displaySpecs = 'Any size';
+                } else {
+                  displaySpecs = `(${preset.originalWidth}x${preset.originalHeight} ${preset.unit})\n${preset.minKB}-${preset.maxKB} KB`;
+                }
+                
+                return (
+                  <button
+                    key={preset.id}
+                    type="button"
+                    className={`preset-card-btn ${selectedPresetId === preset.id ? 'active' : ''}`}
+                    onClick={() => handlePresetSelect(preset)}
+                  >
+                    <span className="preset-card-name">{displayName}</span>
+                    <span className="preset-card-label">{displaySpecs}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
 
@@ -867,8 +896,6 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
                 fontSize: '11px',
                 fontWeight: '700',
                 padding: '8px 16px',
-                borderBottomLeftRadius: '2px',
-                borderBottomRightRadius: '2px',
                 border: '1px solid #44403C',
                 borderTop: 'none',
                 width: '100%',
@@ -876,6 +903,95 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
               }}>
                 <span>⚖️ SIZE: {processedResult ? `~${processedResult.sizeKB} KB` : 'WAITING PROCESS'}</span>
                 <span>📏 DIMS: {getFormattedDimensions(activeDoc, targetUnit)} ({spec.width}x{spec.height}px)</span>
+              </div>
+
+              {/* Horizontal Strip: Background & Quality Checks */}
+              <div className="middle-horizontal-strip">
+                
+                {/* Background Selector Panel */}
+                <div className="strip-section strip-background">
+                  <span className="strip-title">Background</span>
+                  <div className="strip-color-buttons">
+                    {[
+                      { name: 'White', hex: '#FFFFFF' },
+                      { name: 'Light Blue', hex: '#DCEEFF' },
+                      { name: 'Grey', hex: '#E5E5E5' }
+                    ].map((color) => (
+                      <button
+                        key={color.hex}
+                        type="button"
+                        className={`exam-tab-btn ${bgColor === color.hex ? 'active' : ''}`}
+                        style={{
+                          padding: '4px 8px',
+                          fontSize: '11px',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '4px',
+                          height: '28px'
+                        }}
+                        onClick={() => setBgColor(color.hex)}
+                        disabled={!imageSrc}
+                      >
+                        <span style={{
+                          width: '8px',
+                          height: '8px',
+                          backgroundColor: color.hex,
+                          borderRadius: '50%',
+                          border: '1px solid #44403C'
+                        }} />
+                        {color.name}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="strip-divider" />
+
+                {/* Quality Check Panel */}
+                <div className="strip-section strip-quality-check">
+                  <span className="strip-title">Quality Check</span>
+                  <div className="strip-checks-list">
+                    <div className="strip-check-item">
+                      <span style={{
+                        color: processedResult && processedResult.width === spec.width && processedResult.height === spec.height 
+                          ? '#10B981' 
+                          : '#EF4444',
+                        fontWeight: 'bold'
+                      }}>
+                        {processedResult && processedResult.width === spec.width && processedResult.height === spec.height ? '✓' : '●'}
+                      </span>
+                      <span>Resolution: {processedResult ? `${processedResult.width}x${processedResult.height}px` : `${spec.width}x${spec.height}px`}</span>
+                    </div>
+
+                    <div className="strip-check-item">
+                      <span style={{
+                        color: processedResult && processedResult.sizeKB >= spec.minKB && processedResult.sizeKB <= spec.maxKB 
+                          ? '#10B981' 
+                          : '#EF4444',
+                        fontWeight: 'bold'
+                      }}>
+                        {processedResult && processedResult.sizeKB >= spec.minKB && processedResult.sizeKB <= spec.maxKB ? '✓' : '●'}
+                      </span>
+                      <span>Size: {processedResult ? `${processedResult.sizeKB}KB` : `${spec.minKB}-${spec.maxKB}KB`}</span>
+                    </div>
+
+                    <div className="strip-check-item">
+                      <span style={{ color: '#10B981', fontWeight: 'bold' }}>✓</span>
+                      <span>Format: JPG</span>
+                    </div>
+
+                    <div className="strip-check-item">
+                      <span style={{
+                        color: bgColor !== '#FFFFFF' || !imageSrc ? '#10B981' : '#F59E0B',
+                        fontWeight: 'bold'
+                      }}>
+                        {bgColor !== '#FFFFFF' || !imageSrc ? '✓' : '●'}
+                      </span>
+                      <span>BG Check</span>
+                    </div>
+                  </div>
+                </div>
+
               </div>
 
               {/* Primary Actions */}
@@ -889,9 +1005,25 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
                   Resize & Compress
                 </button>
                 
+                {processedResult && (
+                  <button
+                    className="btn-primary"
+                    style={{ flexGrow: 1, padding: '12px' }}
+                    onClick={handleAddToBatchClick}
+                    disabled={
+                      !processedResult ||
+                      !(processedResult.sizeKB >= spec.minKB && processedResult.sizeKB <= spec.maxKB &&
+                        processedResult.width === spec.width && processedResult.height === spec.height)
+                    }
+                  >
+                    Add to Download Batch
+                  </button>
+                )}
+                
                 {activeDoc === 'photo' && (
                   <button
                     className="btn-secondary"
+                    style={{ padding: '12px' }}
                     onClick={handleRemoveBackground}
                     disabled={isProcessing || isCompressing || isRemoving}
                   >
@@ -901,6 +1033,7 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
 
                 <button
                   className="btn-secondary"
+                  style={{ padding: '12px' }}
                   onClick={() => {
                     setImageSrc(null);
                     setUploadedFile(null);
@@ -1071,131 +1204,34 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
             </div>
           </div>
 
-          {/* BACKGROUND Color Filler */}
-          <div className="sidebar-block">
-            <h4 className="sidebar-block-title">Background</h4>
-            <div style={{ display: 'flex', gap: '8px' }}>
-              {[
-                { name: 'White', hex: '#FFFFFF' },
-                { name: 'Light Blue', hex: '#DCEEFF' },
-                { name: 'Grey', hex: '#E5E5E5' }
-              ].map((color) => (
-                <button
-                  key={color.hex}
-                  type="button"
-                  className={`exam-tab-btn ${bgColor === color.hex ? 'active' : ''}`}
-                  style={{
-                    padding: '6px 8px',
-                    fontSize: '11px',
-                    flexGrow: 1,
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    gap: '4px'
-                  }}
-                  onClick={() => setBgColor(color.hex)}
-                  disabled={!imageSrc}
-                >
-                  <span style={{
-                    width: '8px',
-                    height: '8px',
-                    backgroundColor: color.hex,
-                    borderRadius: '50%',
-                    border: '1px solid #44403C'
-                  }}></span>
-                  {color.name}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* QUALITY CHECK list */}
-          <div className="sidebar-block">
-            <h4 className="sidebar-block-title">Quality Check</h4>
-            
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '4px' }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <span style={{
-                  color: processedResult && processedResult.width === spec.width && processedResult.height === spec.height 
-                    ? '#10B981' 
-                    : '#EF4444',
-                  fontWeight: 'bold'
-                }}>
-                  {processedResult && processedResult.width === spec.width && processedResult.height === spec.height ? '✓' : '●'}
-                </span>
-                <span>Resolution: {processedResult ? `${processedResult.width}x${processedResult.height} px` : `${spec.width}x${spec.height} px`}</span>
+          {/* PHOTO TEXT OVERLAY block */}
+          {activeDoc === 'photo' && imageSrc && (
+            <div className="sidebar-block">
+              <h4 className="sidebar-block-title">Text Overlay</h4>
+              <div className="form-group" style={{ marginBottom: '12px' }}>
+                <label className="form-label">Name on Photo</label>
+                <input
+                  type="text"
+                  placeholder="E.g., RAJESH KUMAR"
+                  className="form-input"
+                  value={nameOverlay}
+                  onChange={(e) => setNameOverlay(e.target.value)}
+                  style={{ padding: '6px' }}
+                />
               </div>
-              
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <span style={{
-                  color: processedResult && processedResult.sizeKB >= spec.minKB && processedResult.sizeKB <= spec.maxKB 
-                    ? '#10B981' 
-                    : '#EF4444',
-                  fontWeight: 'bold'
-                }}>
-                  {processedResult && processedResult.sizeKB >= spec.minKB && processedResult.sizeKB <= spec.maxKB ? '✓' : '●'}
-                </span>
-                <span>Size KB: {processedResult ? `${processedResult.sizeKB} KB` : `${spec.minKB}-${spec.maxKB} KB`}</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <span style={{ color: '#10B981', fontWeight: 'bold' }}>✓</span>
-                <span>Format: JPG / JPEG</span>
-              </div>
-
-              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-secondary)' }}>
-                <span style={{
-                  color: bgColor !== '#FFFFFF' || !imageSrc ? '#10B981' : '#F59E0B',
-                  fontWeight: 'bold'
-                }}>
-                  {bgColor !== '#FFFFFF' || !imageSrc ? '✓' : '●'}
-                </span>
-                <span>Background Check</span>
+              <div className="form-group" style={{ marginBottom: 0 }}>
+                <label className="form-label">Date on Photo</label>
+                <input
+                  type="text"
+                  placeholder="E.g., 05/07/2026"
+                  className="form-input"
+                  value={dateOverlay}
+                  onChange={(e) => setDateOverlay(e.target.value)}
+                  style={{ padding: '6px' }}
+                />
               </div>
             </div>
-
-            {activeDoc === 'photo' && imageSrc && (
-              <div style={{ marginTop: '16px', borderTop: '1px dashed var(--border-color)', paddingTop: '16px' }}>
-                <div className="form-group">
-                  <label className="form-label" style={{ fontSize: '10px' }}>Name Overlay</label>
-                  <input
-                    type="text"
-                    placeholder="E.g., RAJESH KUMAR"
-                    className="form-input"
-                    value={nameOverlay}
-                    onChange={(e) => setNameOverlay(e.target.value)}
-                    style={{ padding: '6px' }}
-                  />
-                </div>
-                <div className="form-group" style={{ marginBottom: 0 }}>
-                  <label className="form-label" style={{ fontSize: '10px' }}>Date Overlay</label>
-                  <input
-                    type="text"
-                    placeholder="E.g., 05/07/2026"
-                    className="form-input"
-                    value={dateOverlay}
-                    onChange={(e) => setDateOverlay(e.target.value)}
-                    style={{ padding: '6px' }}
-                  />
-                </div>
-              </div>
-            )}
-
-            <div style={{ marginTop: '20px' }}>
-              <button
-                className="btn-primary"
-                style={{ width: '100%' }}
-                onClick={handleAddToBatchClick}
-                disabled={
-                  !processedResult ||
-                  !(processedResult.sizeKB >= spec.minKB && processedResult.sizeKB <= spec.maxKB &&
-                    processedResult.width === spec.width && processedResult.height === spec.height)
-                }
-              >
-                Add to Download Batch
-              </button>
-            </div>
-          </div>
+          )}
 
           {processedResult && (
             <div className="sidebar-block">
