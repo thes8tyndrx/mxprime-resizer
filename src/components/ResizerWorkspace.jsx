@@ -397,7 +397,9 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
         ? { name: nameOverlay, date: dateOverlay }
         : null;
 
-      const croppedDataUrl = await getCroppedImage(imgRef.current, spec.width, spec.height, overlayData, {
+      // getCroppedImage returns { canvas, dataUrl }
+      // Use the canvas directly — avoids a redundant PNG decode→redraw quality loss
+      const { canvas: croppedCanvas } = await getCroppedImage(imgRef.current, spec.width, spec.height, overlayData, {
         rotation,
         flipH,
         flipV,
@@ -412,36 +414,26 @@ export function ResizerWorkspace({ activeExam, onAddToBatch, addToast }) {
         }
       });
 
-      const canvas = document.createElement('canvas');
-      canvas.width = spec.width;
-      canvas.height = spec.height;
-      const ctx = canvas.getContext('2d');
+      const compressResult = await compressImage(croppedCanvas, spec.minKB, spec.maxKB);
 
-      const tempImg = new Image();
-      tempImg.onload = async () => {
-        ctx.drawImage(tempImg, 0, 0);
-        const compressResult = await compressImage(canvas, spec.minKB, spec.maxKB);
+      // Revoke previous Object URL to free memory
+      if (processedUrlRef.current) {
+        URL.revokeObjectURL(processedUrlRef.current);
+      }
+      const previewUrl = URL.createObjectURL(compressResult.blob);
+      processedUrlRef.current = previewUrl;
 
-        // Revoke previous Object URL to free memory
-        if (processedUrlRef.current) {
-          URL.revokeObjectURL(processedUrlRef.current);
-        }
-        const previewUrl = URL.createObjectURL(compressResult.blob);
-        processedUrlRef.current = previewUrl;
+      setProcessedResult({
+        blob: compressResult.blob,
+        sizeKB: compressResult.sizeKB,
+        width: spec.width,
+        height: spec.height,
+        dataUrl: previewUrl
+      });
 
-        setProcessedResult({
-          blob: compressResult.blob,
-          sizeKB: compressResult.sizeKB,
-          width: spec.width,
-          height: spec.height,
-          dataUrl: previewUrl
-        });
-
-        setShowPreviewModal(true);
-        setIsProcessing(false);
-        addToast('Document resized and compressed successfully!', 'success');
-      };
-      tempImg.src = croppedDataUrl;
+      setShowPreviewModal(true);
+      setIsProcessing(false);
+      addToast('Document resized and compressed successfully!', 'success');
 
     } catch (err) {
       console.error(err);

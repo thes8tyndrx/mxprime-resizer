@@ -234,6 +234,10 @@ export function useImageCrop(aspectRatio = null) {
       tempCanvas.height = naturalHeight;
       const tempCtx = tempCanvas.getContext('2d');
 
+      // Enable high-quality smoothing on the temp canvas (rotation/zoom pass)
+      tempCtx.imageSmoothingEnabled = true;
+      tempCtx.imageSmoothingQuality = 'high';
+
       // 2. Fill background color
       tempCtx.fillStyle = bgColor;
       tempCtx.fillRect(0, 0, naturalWidth, naturalHeight);
@@ -363,9 +367,10 @@ export function useImageCrop(aspectRatio = null) {
         finalCtx.restore();
       }
 
-      // Lossless PNG export to prevent generational JPEG compression quality loss before the final binary size search
+      // Return both the canvas and a lossless PNG dataUrl.
+      // Callers should prefer the canvas directly to avoid a redundant decode→redraw cycle.
       const dataUrl = finalCanvas.toDataURL('image/png');
-      resolve(dataUrl);
+      resolve({ canvas: finalCanvas, dataUrl });
     });
   }, [crop, zoom, pan]);
 

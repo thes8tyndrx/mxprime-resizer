@@ -78,7 +78,7 @@ export function useCompressToTarget() {
     const targetMaxBytes = maxKB * 1024;
     const targetMinBytes = minKB * 1024;
 
-    let lowQuality = 0.05;
+    let lowQuality = 0.3;  // Floor raised from 0.05 — prevents severely pixelated output
     let highQuality = 1.0;
     let quality = 0.9;
     let bestBlob = null;
@@ -118,9 +118,9 @@ export function useCompressToTarget() {
       }
     }
 
-    // If we didn't find any blob fitting targetMaxBytes, fallback to the lowest quality blob
+    // If we didn't find any blob fitting targetMaxBytes, fallback to lowest allowed quality
     if (!bestBlob) {
-      bestBlob = await getBlobForQuality(0.05);
+      bestBlob = await getBlobForQuality(0.3);
       bestSize = bestBlob.size;
     }
 
